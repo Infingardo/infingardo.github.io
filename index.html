@@ -139,10 +139,35 @@
             const [showResult, setShowResult] = useState(false);
             const [isCorrect, setIsCorrect] = useState(false);
             const [shake, setShake] = useState(false);
+            const [easterEggClicks, setEasterEggClicks] = useState(0);
+            const [showEasterEggMessage, setShowEasterEggMessage] = useState(false);
             
             useEffect(() => {
                 setMounted(true);
             }, []);
+
+            // Easter egg timer reset
+            useEffect(() => {
+                if (easterEggClicks > 0) {
+                    const timer = setTimeout(() => setEasterEggClicks(0), 2000);
+                    return () => clearTimeout(timer);
+                }
+            }, [easterEggClicks]);
+
+            const handleEasterEggClick = (e) => {
+                e.stopPropagation();
+                const newCount = easterEggClicks + 1;
+                setEasterEggClicks(newCount);
+                
+                if (newCount === 3) {
+                    setShowEasterEggMessage(true);
+                    setTimeout(() => {
+                        setSelectedCategory('medicina');
+                        setShowEasterEggMessage(false);
+                        setEasterEggClicks(0);
+                    }, 1500);
+                }
+            };
 
             // Quiz questions - Anatomia Patologica
             const quizQuestions = [
@@ -172,9 +197,9 @@
                     correct: 1
                 },
                 {
-                    question: "La mutazione di p53 è più frequentemente associata a:",
-                    options: ["Neoplasie benigne", "Displasia di basso grado", "Carcinomi invasivi", "Iperplasie"],
-                    correct: 2
+                    question: "Quale citocheratina è tipicamente positiva nel carcinoma di Merkel?",
+                    options: ["CK7", "CK20", "CK5/6", "CK19"],
+                    correct: 1
                 },
                 {
                     question: "Il grading secondo Gleason si applica a:",
@@ -182,9 +207,9 @@
                     correct: 1
                 },
                 {
-                    question: "La metaplasia squamosa nell'esofago è tipica di:",
-                    options: ["Esofago di Barrett", "Reflusso cronico", "Acalasia", "Diverticoli"],
-                    correct: 1
+                    question: "La metaplasia intestinale nell'esofago distale è tipica di:",
+                    options: ["Esofago di Barrett", "Reflusso acuto", "Acalasia", "Diverticoli"],
+                    correct: 0
                 },
                 {
                     question: "Quale di questi NON è un criterio di Bethesda per citologia tiroidea?",
@@ -206,8 +231,8 @@
             const apps = {
                 medicina: [
                     {
-                        name: 'Dermatiti',
-                        url: 'https://infingardo.github.io/dermattiti/',
+                        name: 'Cute lesioni infiammatorie',
+                        url: 'https://infingardo.github.io/dermatiti/',
                         description: 'Patologie dermatologiche',
                         icon: <Pill className="w-6 h-6" />,
                         color: 'from-green-500 to-emerald-500'
@@ -311,7 +336,7 @@
                 );
             };
 
-            const CategoryCard = ({ title, description, icon, color, count, onClick, locked }) => (
+            const CategoryCard = ({ title, description, icon, color, count, onClick, locked, onEasterEgg }) => (
                 <button
                     onClick={onClick}
                     className="card-shine group relative glass rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden transform hover:-translate-y-4 hover:scale-105 w-full"
@@ -322,8 +347,12 @@
                     <div className="relative p-12">
                         <div className="flex flex-col items-center text-center">
                             {locked && (
-                                <div className="absolute top-6 right-6">
-                                    <Lock className="w-8 h-8 text-yellow-500 animate-pulse" />
+                                <div 
+                                    className="absolute top-6 right-6 cursor-pointer"
+                                    onClick={onEasterEgg}
+                                    title="🤫"
+                                >
+                                    <Lock className="w-8 h-8 text-yellow-500 animate-pulse hover:scale-110 transition-transform" />
                                 </div>
                             )}
                             
@@ -504,6 +533,19 @@
                             </div>
                         )}
 
+                        {/* Easter Egg Message */}
+                        {showEasterEggMessage && (
+                            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                                <div className="glass max-w-md w-full rounded-3xl shadow-2xl p-8 text-center">
+                                    <div className="text-6xl mb-4">🔓✨</div>
+                                    <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 mb-2">
+                                        Easter Egg Sbloccato!
+                                    </h2>
+                                    <p className="text-gray-600">Accesso diretto garantito 😎</p>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Category Selection or App List */}
                         {!selectedCategory ? (
                             <div className={`max-w-4xl mx-auto transform transition-all duration-1000 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
@@ -516,6 +558,7 @@
                                         count={apps.medicina.length}
                                         locked={true}
                                         onClick={() => setShowQuiz(true)}
+                                        onEasterEgg={handleEasterEggClick}
                                     />
                                     <CategoryCard
                                         title="ALTRO"
