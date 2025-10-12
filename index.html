@@ -160,6 +160,7 @@
             const [showEasterEggMessage, setShowEasterEggMessage] = useState(false);
             const [deferredPrompt, setDeferredPrompt] = useState(null);
             const [showInstallButton, setShowInstallButton] = useState(false);
+            const [randomQuestion, setRandomQuestion] = useState(null);
             
             useEffect(() => {
                 setMounted(true);
@@ -176,6 +177,9 @@
                 // Check if already installed
                 if (window.matchMedia('(display-mode: standalone)').matches) {
                     setShowInstallButton(false);
+                } else {
+                    // Mostra sempre il pulsante se non è già installato
+                    setShowInstallButton(true);
                 }
                 
                 return () => {
@@ -184,22 +188,29 @@
             }, []);
 
             const handleInstallClick = async () => {
-                if (!deferredPrompt) {
-                    // iOS fallback - show instructions
-                    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-                        alert('Per installare su iOS:\n\n1. Tocca l\'icona Condividi (quadrato con freccia) in basso\n2. Scorri e seleziona "Aggiungi a Home"\n3. Tocca "Aggiungi"');
+                if (deferredPrompt) {
+                    // Android Chrome - installazione automatica
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    
+                    if (outcome === 'accepted') {
+                        setShowInstallButton(false);
                     }
-                    return;
+                    
+                    setDeferredPrompt(null);
+                } else {
+                    // Mostra istruzioni per iOS e Desktop
+                    const userAgent = navigator.userAgent.toLowerCase();
+                    let instructions = '';
+                    
+                    if (/iphone|ipad|ipod/.test(userAgent)) {
+                        instructions = '📱 Per installare su iOS:\n\n1. Tocca l\'icona Condividi 􀈂 in basso\n2. Scorri e seleziona "Aggiungi a Home"\n3. Tocca "Aggiungi"';
+                    } else {
+                        instructions = '💻 Per installare su Desktop:\n\n1. Guarda in alto a destra nella barra degli indirizzi\n2. Clicca sull\'icona "Installa" (computer con freccia)\n\nOppure:\n\nMenu (⋮) → "Installa Filippo\'s Dashboard app"';
+                    }
+                    
+                    alert(instructions);
                 }
-                
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                
-                if (outcome === 'accepted') {
-                    setShowInstallButton(false);
-                }
-                
-                setDeferredPrompt(null);
             };
 
             // Easter egg timer reset
@@ -233,6 +244,12 @@
 
             const handleCategoryClick = (category) => {
                 setQuizType(category);
+                // Select random question based on category
+                if (category === 'medicina') {
+                    setRandomQuestion(medicinaQuestions[Math.floor(Math.random() * medicinaQuestions.length)]);
+                } else {
+                    setRandomQuestion(altroQuestions[Math.floor(Math.random() * altroQuestions.length)]);
+                }
                 setShowQuiz(true);
             };
 
@@ -592,11 +609,11 @@
                                         <>
                                             <div className="mb-8">
                                                 <p className="text-xl font-semibold text-gray-800 mb-6">
-                                                    {randomQuestion.question}
+                                                    {randomQuestion?.question}
                                                 </p>
                                                 
                                                 <div className="space-y-3">
-                                                    {randomQuestion.options.map((option, index) => (
+                                                    {randomQuestion?.options.map((option, index) => (
                                                         <button
                                                             key={index}
                                                             onClick={() => setSelectedAnswer(index)}
@@ -650,7 +667,7 @@
                                                 <>
                                                     <XCircle className="w-24 h-24 text-red-500 mx-auto mb-4" />
                                                     <h3 className="text-3xl font-black text-red-600 mb-2">
-                                                        {quizType === 'medicina' ? 'Risposta errata' : randomQuestion.wrongMessage}
+                                                        {quizType === 'medicina' ? 'Risposta errata' : randomQuestion?.wrongMessage}
                                                     </h3>
                                                     <p className="text-gray-600">
                                                         {quizType === 'medicina' ? 'Riprova!' : 'Riprova a sbagliare! 🙃'}
