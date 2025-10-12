@@ -134,12 +134,15 @@
             const [searchTerm, setSearchTerm] = useState('');
             const [mounted, setMounted] = useState(false);
             const [showQuiz, setShowQuiz] = useState(false);
+            const [quizType, setQuizType] = useState(null); // 'medicina' or 'altro'
             const [currentQuestion, setCurrentQuestion] = useState(0);
             const [selectedAnswer, setSelectedAnswer] = useState(null);
             const [showResult, setShowResult] = useState(false);
             const [isCorrect, setIsCorrect] = useState(false);
             const [shake, setShake] = useState(false);
             const [easterEggClicks, setEasterEggClicks] = useState(0);
+            const [easterEggInput, setEasterEggInput] = useState('');
+            const [showEasterEggInput, setShowEasterEggInput] = useState(false);
             const [showEasterEggMessage, setShowEasterEggMessage] = useState(false);
             
             useEffect(() => {
@@ -156,21 +159,32 @@
 
             const handleEasterEggClick = (e) => {
                 e.stopPropagation();
-                const newCount = easterEggClicks + 1;
-                setEasterEggClicks(newCount);
-                
-                if (newCount === 3) {
+                setShowEasterEggInput(true);
+            };
+
+            const handleEasterEggSubmit = () => {
+                if (easterEggInput.toLowerCase().trim() === 'rosai') {
                     setShowEasterEggMessage(true);
+                    setShowEasterEggInput(false);
                     setTimeout(() => {
                         setSelectedCategory('medicina');
                         setShowEasterEggMessage(false);
-                        setEasterEggClicks(0);
-                    }, 1500);
+                        setEasterEggInput('');
+                    }, 2000);
+                } else {
+                    setShake(true);
+                    setTimeout(() => setShake(false), 500);
+                    setEasterEggInput('');
                 }
             };
 
+            const handleCategoryClick = (category) => {
+                setQuizType(category);
+                setShowQuiz(true);
+            };
+
             // Quiz questions - Anatomia Patologica
-            const quizQuestions = [
+            const medicinaQuestions = [
                 {
                     question: "Quale colorazione istologica si usa per identificare le fibre elastiche?",
                     options: ["Tricromica di Masson", "Van Gieson", "PAS", "Ziehl-Neelsen"],
@@ -223,10 +237,36 @@
                 },
             ];
 
-            // Randomly select a question
-            const [randomQuestion] = useState(() => 
-                quizQuestions[Math.floor(Math.random() * quizQuestions.length)]
-            );
+            // Quiz questions - ALTRO (devi SBAGLIARE!)
+            const altroQuestions = [
+                {
+                    question: "Asino + Asina = ?",
+                    options: ["Asinello", "Puledro", "Cavallino", "Equino"],
+                    correct: 0, // La risposta GIUSTA è asinello, quindi devi sbagliarla!
+                    wrongMessage: "Se lo sai già è inutile scaricare l'app! 😏"
+                },
+                {
+                    question: "Qual è il sinonimo di 'felice'?",
+                    options: ["Contento", "Triste", "Arrabbiato", "Annoiato"],
+                    correct: 0,
+                    wrongMessage: "Troppo bravo! Non hai bisogno del dizionario! 📚"
+                },
+                {
+                    question: "Come si chiama il verso del cavallo?",
+                    options: ["Nitrito", "Muggito", "Belato", "Cinguettio"],
+                    correct: 0,
+                    wrongMessage: "Esperto di equini detected! App non necessaria! 🐴"
+                }
+            ];
+
+            // Randomly select a question based on quiz type
+            const [randomQuestion] = useState(() => {
+                if (quizType === 'medicina') {
+                    return medicinaQuestions[Math.floor(Math.random() * medicinaQuestions.length)];
+                } else {
+                    return altroQuestions[Math.floor(Math.random() * altroQuestions.length)];
+                }
+            });
             
             const apps = {
                 medicina: [
@@ -308,16 +348,25 @@
             const handleAnswerSubmit = () => {
                 if (selectedAnswer === null) return;
                 
-                const correct = selectedAnswer === randomQuestion.correct;
+                let correct;
+                if (quizType === 'medicina') {
+                    // Per medicina: rispondi correttamente per entrare
+                    correct = selectedAnswer === randomQuestion.correct;
+                } else {
+                    // Per altro: devi SBAGLIARE per entrare!
+                    correct = selectedAnswer !== randomQuestion.correct;
+                }
+                
                 setIsCorrect(correct);
                 setShowResult(true);
                 
                 if (correct) {
                     setTimeout(() => {
                         setShowQuiz(false);
-                        setSelectedCategory('medicina');
+                        setSelectedCategory(quizType);
                         setShowResult(false);
                         setSelectedAnswer(null);
+                        setQuizType(null);
                     }, 2000);
                 } else {
                     setShake(true);
@@ -325,7 +374,7 @@
                     setTimeout(() => {
                         setShowResult(false);
                         setSelectedAnswer(null);
-                    }, 2000);
+                    }, 2500);
                 }
             };
 
@@ -375,7 +424,7 @@
                             
                             {locked && (
                                 <p className="mt-4 text-sm text-yellow-600 font-semibold">
-                                    🔐 Quiz medico richiesto
+                                    {title === 'MEDICINA' ? '🔐 Quiz medico richiesto' : '🔐 Quiz inverso richiesto'}
                                 </p>
                             )}
                         </div>
@@ -458,11 +507,17 @@
                             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                                 <div className={`glass max-w-2xl w-full rounded-3xl shadow-2xl p-8 ${shake ? 'animate-shake' : ''}`}>
                                     <div className="text-center mb-8">
-                                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-white mb-4">
-                                            <Stethoscope className="w-10 h-10" />
+                                        <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br ${quizType === 'medicina' ? 'from-blue-500 to-cyan-500' : 'from-purple-500 to-pink-500'} text-white mb-4`}>
+                                            {quizType === 'medicina' ? <Stethoscope className="w-10 h-10" /> : <Grid3x3 className="w-10 h-10" />}
                                         </div>
-                                        <h2 className="text-3xl font-black text-gray-800 mb-2">Quiz Medico</h2>
-                                        <p className="text-gray-600">Rispondi correttamente per accedere alla sezione Medicina</p>
+                                        <h2 className="text-3xl font-black text-gray-800 mb-2">
+                                            {quizType === 'medicina' ? 'Quiz Medico' : 'Quiz Inverso'}
+                                        </h2>
+                                        <p className="text-gray-600">
+                                            {quizType === 'medicina' 
+                                                ? 'Rispondi correttamente per accedere'
+                                                : '⚠️ Devi SBAGLIARE la risposta per entrare! ⚠️'}
+                                        </p>
                                     </div>
 
                                     {!showResult ? (
@@ -479,7 +534,7 @@
                                                             onClick={() => setSelectedAnswer(index)}
                                                             className={`w-full text-left p-4 rounded-xl transition-all duration-300 ${
                                                                 selectedAnswer === index
-                                                                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg scale-105'
+                                                                    ? `bg-gradient-to-r ${quizType === 'medicina' ? 'from-blue-500 to-cyan-500' : 'from-purple-500 to-pink-500'} text-white shadow-lg scale-105`
                                                                     : 'glass hover:shadow-md hover:scale-102'
                                                             }`}
                                                         >
@@ -494,6 +549,7 @@
                                                     onClick={() => {
                                                         setShowQuiz(false);
                                                         setSelectedAnswer(null);
+                                                        setQuizType(null);
                                                     }}
                                                     className="flex-1 px-6 py-3 rounded-xl glass hover:shadow-lg transition-all duration-300 font-semibold"
                                                 >
@@ -505,7 +561,7 @@
                                                     className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                                                         selectedAnswer === null
                                                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                                            : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg hover:shadow-xl hover:scale-105'
+                                                            : `bg-gradient-to-r ${quizType === 'medicina' ? 'from-blue-500 to-cyan-500' : 'from-purple-500 to-pink-500'} text-white shadow-lg hover:shadow-xl hover:scale-105`
                                                     }`}
                                                 >
                                                     Conferma
@@ -517,18 +573,72 @@
                                             {isCorrect ? (
                                                 <>
                                                     <CheckCircle className="w-24 h-24 text-green-500 mx-auto mb-4" />
-                                                    <h3 className="text-3xl font-black text-green-600 mb-2">Corretto! 🎉</h3>
+                                                    <h3 className="text-3xl font-black text-green-600 mb-2">
+                                                        {quizType === 'medicina' ? 'Corretto! 🎉' : 'Sbagliato al punto giusto! 😎'}
+                                                    </h3>
                                                     <p className="text-gray-600">Accesso consentito...</p>
                                                 </>
                                             ) : (
                                                 <>
                                                     <XCircle className="w-24 h-24 text-red-500 mx-auto mb-4" />
-                                                    <h3 className="text-3xl font-black text-red-600 mb-2">Risposta errata</h3>
-                                                    <p className="text-gray-600">Riprova!</p>
+                                                    <h3 className="text-3xl font-black text-red-600 mb-2">
+                                                        {quizType === 'medicina' ? 'Risposta errata' : randomQuestion.wrongMessage}
+                                                    </h3>
+                                                    <p className="text-gray-600">
+                                                        {quizType === 'medicina' ? 'Riprova!' : 'Riprova a sbagliare! 🙃'}
+                                                    </p>
                                                 </>
                                             )}
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Easter Egg Input Modal */}
+                        {showEasterEggInput && (
+                            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                                <div className={`glass max-w-md w-full rounded-3xl shadow-2xl p-8 ${shake ? 'animate-shake' : ''}`}>
+                                    <div className="text-center mb-6">
+                                        <div className="text-6xl mb-4">🔬</div>
+                                        <h2 className="text-2xl font-black text-gray-800 mb-2">
+                                            Easter Egg
+                                        </h2>
+                                        <p className="text-gray-600 text-sm mb-4">
+                                            Chi è il padre dell'anatomia patologica moderna?
+                                        </p>
+                                        <p className="text-xs text-gray-500 italic">
+                                            (Suggerimento: NON è Virchow...)
+                                        </p>
+                                    </div>
+
+                                    <input
+                                        type="text"
+                                        value={easterEggInput}
+                                        onChange={(e) => setEasterEggInput(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleEasterEggSubmit()}
+                                        placeholder="Inserisci il nome..."
+                                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors mb-4 text-center font-semibold"
+                                        autoFocus
+                                    />
+
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => {
+                                                setShowEasterEggInput(false);
+                                                setEasterEggInput('');
+                                            }}
+                                            className="flex-1 px-4 py-3 rounded-xl glass hover:shadow-lg transition-all duration-300 font-semibold"
+                                        >
+                                            Annulla
+                                        </button>
+                                        <button
+                                            onClick={handleEasterEggSubmit}
+                                            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 font-semibold"
+                                        >
+                                            Conferma
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -539,9 +649,9 @@
                                 <div className="glass max-w-md w-full rounded-3xl shadow-2xl p-8 text-center">
                                     <div className="text-6xl mb-4">🔓✨</div>
                                     <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 mb-2">
-                                        Easter Egg Sbloccato!
+                                        ROSAI! 🎉
                                     </h2>
-                                    <p className="text-gray-600">Accesso diretto garantito 😎</p>
+                                    <p className="text-gray-600">Il vero maestro! Accesso garantito...</p>
                                 </div>
                             </div>
                         )}
@@ -557,7 +667,7 @@
                                         color="from-blue-500 to-cyan-500"
                                         count={apps.medicina.length}
                                         locked={true}
-                                        onClick={() => setShowQuiz(true)}
+                                        onClick={() => handleCategoryClick('medicina')}
                                         onEasterEgg={handleEasterEggClick}
                                     />
                                     <CategoryCard
@@ -566,7 +676,8 @@
                                         icon={<Grid3x3 className="w-16 h-16" />}
                                         color="from-purple-500 to-pink-500"
                                         count={apps.altro.length}
-                                        onClick={() => setSelectedCategory('altro')}
+                                        locked={true}
+                                        onClick={() => handleCategoryClick('altro')}
                                     />
                                 </div>
                             </div>
