@@ -287,6 +287,11 @@
                     question: "L'adenoma pleomorfo della parotide si caratterizza istologicamente per:",
                     options: ["Cellule mucose pure senza differenziamento mioepiteliale", "Proliferazione contemporanea di componenti epiteliali e mioepiteliali con stroma mixoide", "Esclusiva differenziazione squamosa cheratinizzante", "Presenze di cristalli di Reinke"],
                     correct: 1
+                },
+                {
+                    question: "Qual è il cut-off di eosinofili/HPF per la diagnosi di esofagite eosinofila?",
+                    options: ["≥5 eos/HPF", "≥10 eos/HPF", "≥15 eos/HPF", "≥20 eos/HPF"],
+                    correct: 2
                 }
             ];
 
@@ -321,6 +326,13 @@
                         color: 'from-rose-500 to-red-500'
                     },
                     {
+                        name: 'Cute - Dermatiti',
+                        url: 'https://infingardo.github.io/dermatiti/',
+                        description: 'Patologie dermatologiche infiammatorie',
+                        icon: <Pill className="w-6 h-6" />,
+                        color: 'from-green-500 to-emerald-500'
+                    },
+                    {
                         name: 'Cute - Lesioni pigmentate',
                         url: 'https://infingardo.github.io/melanoma/',
                         description: 'Neoplasie melanocitarie',
@@ -335,11 +347,11 @@
                         color: 'from-fuchsia-500 to-purple-500'
                     },
                     {
-                        name: 'Cute - Dermatiti',
-                        url: 'https://infingardo.github.io/dermatiti/',
-                        description: 'Patologie dermatologiche infiammatorie',
-                        icon: <Pill className="w-6 h-6" />,
-                        color: 'from-green-500 to-emerald-500'
+                        name: 'Esofago - Esofagiti',
+                        url: 'https://infingardo.github.io/Esofagiti/',
+                        description: 'Patologie esofagee infiammatorie',
+                        icon: <Stethoscope className="w-6 h-6" />,
+                        color: 'from-amber-500 to-orange-500'
                     },
                     {
                         name: 'Fegato - Epatiti',
@@ -349,46 +361,11 @@
                         color: 'from-emerald-500 to-teal-500'
                     },
                     {
-                        name: 'Placenta - Esame macro e microscopico',
-                        url: 'https://infingardo.github.io/placenta/',
-                        description: 'Refertazione istologica e algoritmo diagnostico',
+                        name: 'Ghiandole Salivari - Neoplasie',
+                        url: 'https://infingardo.github.io/ghiandole_salivari/',
+                        description: 'DD PA vs ACC e altre neoplasie salivari',
                         icon: <Microscope className="w-6 h-6" />,
-                        color: 'from-rose-500 to-pink-500'
-                    },
-                    {
-                        name: 'Stomaco - Gastriti (USS e OLGA)',
-                        url: 'https://infingardo.github.io/Gastriti/',
-                        description: 'Patologie gastriche e Helicobacter pylori',
-                        icon: <Stethoscope className="w-6 h-6" />,
-                        color: 'from-blue-500 to-cyan-500'
-                    },
-                    {
-                        name: 'Multiorgano - IgG4-RD',
-                        url: 'https://infingardo.github.io/IgG4/',
-                        description: 'Algoritmo diagnostico malattia correlata IgG4',
-                        icon: <Microscope className="w-6 h-6" />,
-                        color: 'from-cyan-500 to-blue-500'
-                    },
-                    {
-                        name: 'Intestino - Malattie infiammatorie',
-                        url: 'https://infingardo.github.io/IBD/',
-                        description: 'Inflammatory Bowel Disease',
-                        icon: <Activity className="w-6 h-6" />,
-                        color: 'from-red-500 to-pink-500'
-                    },
-                    {
-                        name: 'Sistema Nervoso Centrale - Gliomi',
-                        url: 'https://infingardo.github.io/snc-diagnostic-tool/',
-                        description: 'Neoplasie cerebrali WHO 2021',
-                        icon: <Microscope className="w-6 h-6" />,
-                        color: 'from-purple-500 to-indigo-500'
-                    },
-                    {
-                        name: 'Midollo Osseo - Neoplasie mieloproliferative',
-                        url: 'https://infingardo.github.io/NMC/',
-                        description: 'NMC croniche - patologie ematologiche',
-                        icon: <Activity className="w-6 h-6" />,
-                        color: 'from-teal-500 to-cyan-500'
+                        color: 'from-lime-500 to-green-500'
                     },
                     {
                         name: 'IIC - p53',
@@ -405,11 +382,46 @@
                         color: 'from-orange-500 to-amber-500'
                     },
                     {
-                        name: 'Ghiandole Salivari - Neoplasie',
-                        url: 'https://infingardo.github.io/ghiandole_salivari/',
-                        description: 'DD PA vs ACC e altre neoplasie salivari',
+                        name: 'Intestino - Malattie infiammatorie',
+                        url: 'https://infingardo.github.io/IBD/',
+                        description: 'Inflammatory Bowel Disease',
+                        icon: <Activity className="w-6 h-6" />,
+                        color: 'from-red-500 to-pink-500'
+                    },
+                    {
+                        name: 'Midollo Osseo - Neoplasie mieloproliferative',
+                        url: 'https://infingardo.github.io/NMC/',
+                        description: 'NMC croniche - patologie ematologiche',
+                        icon: <Activity className="w-6 h-6" />,
+                        color: 'from-teal-500 to-cyan-500'
+                    },
+                    {
+                        name: 'Multiorgano - IgG4-RD',
+                        url: 'https://infingardo.github.io/IgG4/',
+                        description: 'Algoritmo diagnostico malattia correlata IgG4',
                         icon: <Microscope className="w-6 h-6" />,
-                        color: 'from-lime-500 to-green-500'
+                        color: 'from-cyan-500 to-blue-500'
+                    },
+                    {
+                        name: 'Placenta - Esame macro e microscopico',
+                        url: 'https://infingardo.github.io/placenta/',
+                        description: 'Refertazione istologica e algoritmo diagnostico',
+                        icon: <Microscope className="w-6 h-6" />,
+                        color: 'from-rose-500 to-pink-500'
+                    },
+                    {
+                        name: 'Sistema Nervoso Centrale - Gliomi',
+                        url: 'https://infingardo.github.io/snc-diagnostic-tool/',
+                        description: 'Neoplasie cerebrali WHO 2021',
+                        icon: <Microscope className="w-6 h-6" />,
+                        color: 'from-purple-500 to-indigo-500'
+                    },
+                    {
+                        name: 'Stomaco - Gastriti (USS e OLGA)',
+                        url: 'https://infingardo.github.io/Gastriti/',
+                        description: 'Patologie gastriche e Helicobacter pylori',
+                        icon: <Stethoscope className="w-6 h-6" />,
+                        color: 'from-blue-500 to-cyan-500'
                     }
                 ],
                 altro: [
