@@ -16,7 +16,7 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@3.4.17/dist/tailwind.min.css">
     <style>
         @keyframes gradient {
             0% { background-position: 0% 50%; }
@@ -169,6 +169,13 @@
             
             const apps = {
                 medicina: [
+                    {
+                        name: 'TNM 9ª Ed. - Stadiazione oncologica',
+                        url: 'https://infingardo.github.io/TNM/',
+                        description: 'Classificazione TNM UICC 2025 — 26 sedi, staging interattivo, referto',
+                        icon: <Microscope className="w-6 h-6" />,
+                        color: 'from-sky-600 to-blue-700'
+                    },
                     {
                         name: 'Arterie - Arterite a cellule giganti',
                         url: 'https://infingardo.github.io/arteriti/',
