@@ -35,11 +35,15 @@ self.addEventListener('fetch', e => {
 
   const isDoc = req.mode === 'navigate' || /\.html$/.test(url.pathname);
   if (isDoc) {
-    // Network-first per i documenti: contenuto sempre aggiornato online, cache come fallback offline.
+    // Stale-while-revalidate: serve SUBITO la copia in cache (veloce); se online, scarica
+    // l'aggiornamento in background e lo mette in cache per la prossima apertura.
     e.respondWith(
-      fetch(req)
-        .then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req, cp)); return r; })
-        .catch(() => caches.match(req).then(m => m || caches.match('./index.html')))
+      caches.match(req).then(cached => {
+        const network = fetch(req)
+          .then(r => { if (r && r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req, cp)); } return r; })
+          .catch(() => null);
+        return cached || network.then(r => r || caches.match('./index.html'));
+      })
     );
   } else {
     // Cache-first per gli asset (js/css/png/woff2/json): disponibili offline dopo la prima visita.
