@@ -1,7 +1,7 @@
 // Service worker della dashboard — PWA offline.
 // Precache della shell (dashboard + librerie locali + icone); runtime-cache same-origin
 // per le app: ogni app diventa disponibile offline dopo la prima apertura online.
-const CACHE = 'dashboard-v2';
+const CACHE = 'dashboard-v3';
 const PRECACHE = [
   './',
   './index.html',
