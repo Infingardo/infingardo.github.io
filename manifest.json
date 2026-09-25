@@ -2,6 +2,7 @@
   "name": "Filippo's Dashboard app",
   "short_name": "Dashboard",
   "description": "Applicazioni mediche e progetti in un unico posto",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
